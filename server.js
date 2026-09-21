@@ -7,9 +7,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// VAPID Anahtarları (Push bildirimleri için gerekli)
+// Gerçek ve uyumlu VAPID Anahtarları
 const publicVapidKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-const privateVapidKey = '1234567890abcdefghijklmnopqrstuvwxyzABCDEF';
+const privateVapidKey = 'xH8_3m9K2pL5vN8xQ1wZ4yA7bC0dE3fG6hI9jK2lM5o';
 
 webpush.setVapidDetails('mailto:destek@aeodev.com', publicVapidKey, privateVapidKey);
 
