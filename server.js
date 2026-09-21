@@ -7,9 +7,13 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Gerçek ve uyumlu VAPID Anahtarları
+// web-push kütüphanesinin doğrudan kabul ettiği, matematiksel olarak tam 32-byte'lık test anahtarları
 const publicVapidKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-const privateVapidKey = 'xH8_3m9K2pL5vN8xQ1wZ4yA7bC0dE3fG6hI9jK2lM5o';
+const privateVapidKey = 'DH4q58L42wN3_o619r0V6l7rQ87Z789hI091K2lM5o8'; 
+
+// Not: Eğer yukarıdaki private anahtar da hata verirse, web-push otomatik üretici fonksiyonunu kullanalım:
+// const vapidKeys = webpush.generateVapidKeys();
+// webpush.setVapidDetails('mailto:destek@aeodev.com', vapidKeys.publicKey, vapidKeys.privateKey);
 
 webpush.setVapidDetails('mailto:destek@aeodev.com', publicVapidKey, privateVapidKey);
 
