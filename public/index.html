@@ -7,71 +7,30 @@
     <title>AE Ödev Sistemi</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         h2 { color: #1f2937; text-align: center; }
-        .card { background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
-        button { background: #4f46e5; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+        button { background: #4f46e5; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
         button:hover { background: #4338ca; }
-        
-        /* Ödev Durum Renkleri */
-        .badge { padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px; }
-        .status-yapti { background: #16a34a; }          /* Yeşil */
-        .status-yapmadi { background: #dc2626; }        /* Kırmızı */
-        .status-eksik { background: #ca8a04; color: black; } /* Sarı */
-        .status-getirmedi { background: #7f1d1d; }     /* Bordo */
-        .status-gec { background: #eab308; color: black; }   /* Ateş Sarısı */
-        .status-gelmedi { background: #ea580c; }      /* Turuncu */
-        .status-izinli { background: #4b5563; }       /* Gri */
-
-        .tab-btn { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn button { background: #e5e7eb; color: #374151; }
-        .tab-btn button.active { background: #4f46e5; color: white; }
+        .homework-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; margin-top: 10px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📚 AE Ödev ve Takip Sistemi</h2>
+    <h2>📚 AE Ödev Sistemi</h2>
     
-    <div class="tab-btn">
-        <button id="btnTeacher" onclick="switchTab('teacher')">Öğretmen Paneli</button>
-        <button id="btnStudent" onclick="switchTab('student')">Öğrenci / Veli Paneli</button>
-    </div>
+    <h3>Ödev Yayınla</h3>
+    <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
+    <input type="text" id="title" placeholder="Ödev Başlığı">
+    <textarea id="desc" placeholder="Açıklama..."></textarea>
+    <button onclick="publishHomework()">Yayınla ve Bildirim Gönder 🚀</button>
 
-    <!-- ÖĞRETMEN PANELİ -->
-    <div id="teacherPanel" class="card">
-        <h3>Yeni Ödev Yayınla & Bildirim Gönder</h3>
-        <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
-        <input type="text" id="title" placeholder="Ödev Başlığı / Konusu">
-        <textarea id="desc" placeholder="Ödev detayları ve açıklaması..."></textarea>
-        <button onclick="publishHomework()">Ödevi Yayınla ve Bildirim Gönder 🚀</button>
-    </div>
-
-    <!-- ÖĞRENCİ PANELİ -->
-    <div id="studentPanel" class="card" style="display:none;">
-        <h3>Verilen Ödevler ve Durumlar</h3>
-        <div id="homeworkList">Yükleniyor...</div>
-    </div>
+    <h3 style="margin-top: 25px;">Verilen Ödevler</h3>
+    <div id="homeworkList">Yükleniyor...</div>
 </div>
 
 <script>
-    function switchTab(role) {
-        if(role === 'teacher') {
-            document.getElementById('teacherPanel').style.display = 'block';
-            document.getElementById('studentPanel').style.display = 'none';
-            document.getElementById('btnTeacher').classList.add('active');
-            document.getElementById('btnStudent').classList.remove('active');
-        } else {
-            document.getElementById('teacherPanel').style.display = 'none';
-            document.getElementById('studentPanel').style.display = 'block';
-            document.getElementById('btnStudent').classList.add('active');
-            document.getElementById('btnTeacher').classList.remove('active');
-            loadHomeworks();
-        }
-    }
-
-    // Bildirim İzni İsteme
     async function requestNotificationPermission() {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             const reg = await navigator.serviceWorker.register('/sw.js');
@@ -97,7 +56,7 @@
         const desc = document.getElementById('desc').value;
 
         if(!subject || !title) {
-            alert('Lütfen ders adı ve ödev başlığını doldurun.');
+            alert('Lütfen alanları doldurun.');
             return;
         }
 
@@ -109,10 +68,11 @@
 
         const data = await res.json();
         if(data.success) {
-            alert('Ödev başarıyla yayınlandı ve cihazlara bildirim gönderildi!');
+            alert('Ödev yayınlandı ve bildirim gönderildi!');
             document.getElementById('subject').value = '';
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
+            loadHomeworks();
         }
     }
 
@@ -122,53 +82,19 @@
         const container = document.getElementById('homeworkList');
         
         if(list.length === 0) {
-            container.innerHTML = '<p>Henüz verilmiş bir ödev yok.</p>';
+            container.innerHTML = '<p style="color:#666;">Henüz ödev yok.</p>';
             return;
         }
 
         container.innerHTML = list.map(hw => `
-            <div style="background:white; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ddd;">
+            <div class="homework-item">
                 <strong>${hw.subject}</strong>: ${hw.title}
-                <p style="margin:5px 0; color:#555;">${hw.desc}</p>
-                <hr style="border:0; border-top:1px solid #eee;">
-                <label>Ödev Durumu:</label>
-                <select onchange="updateStatus(${hw.id}, this.value)">
-                    <option value="yapti" ${hw.status==='yapti'?'selected':''}>Yaptı (Yeşil)</option>
-                    <option value="yapmadi" ${hw.status==='yapmadi'?'selected':''}>Yapmadı (Kırmızı)</option>
-                    <option value="eksik" ${hw.status==='eksik'?'selected':''}>Eksik (Sarı)</option>
-                    <option value="getirmedi" ${hw.status==='getirmedi'?'selected':''}>Getirmedi (Bordo)</option>
-                    <option value="gec" ${hw.status==='gec'?'selected':''}>Geç Getirdi (Ateş Sarısı)</option>
-                    <option value="gelmedi" ${hw.status==='gelmedi'?'selected':''}>Gelmedi (Turuncu)</option>
-                    <option value="izinli" ${hw.status==='izinli'?'selected':''}>İzinli (Gri)</option>
-                </select>
-                <div style="margin-top:5px;">
-                    Durum: <span class="badge status-${hw.status}">${getStatusText(hw.status)}</span>
-                </div>
+                <p style="margin: 5px 0 0 0; color: #4b5563; font-size: 14px;">${hw.desc}</p>
             </div>
         `).join('');
     }
 
-    function getStatusText(status) {
-        switch(status) {
-            case 'yapti': return 'YAPTI';
-            case 'yapmadi': return 'YAPMADI';
-            case 'eksik': return 'EKSİK';
-            case 'getirmedi': return 'GETİRMEDİ';
-            case 'gec': return 'GEÇ GETİRDİ';
-            case 'gelmedi': return 'GELMEDİ';
-            case 'izinli': return 'İZİNLİ';
-            default: return 'YAPTI';
-        }
-    }
-
-    async function updateStatus(id, status) {
-        await fetch('/api/update-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, status })
-        });
-        loadHomeworks();
-    }
+    loadHomeworks();
 </script>
 
 </body>
