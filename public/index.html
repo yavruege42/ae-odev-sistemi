@@ -6,13 +6,15 @@
     <link rel="manifest" href="/manifest.json">
     <title>AE Ödev Sistemi</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h2 { color: #1f2937; text-align: center; }
-        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
-        button { background: #4f46e5; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
-        button:hover { background: #4338ca; }
-        .homework-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; margin-top: 10px; border-radius: 6px; }
+        body { font-family: Arial, sans-serif; background: #eff6ff; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1); }
+        h2 { color: #1e40af; text-align: center; }
+        h3 { color: #1e3a8a; font-size: 16px; margin-top: 20px; }
+        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #93c5fd; border-radius: 6px; box-sizing: border-box; }
+        input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+        button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+        .homework-item { background: #f8fafc; border: 1px solid #bfdbfe; padding: 12px; margin-top: 10px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -20,13 +22,13 @@
 <div class="container">
     <h2>📚 AE Ödev Sistemi</h2>
     
-    <h3>Ödev Yayınla</h3>
+    <h3>Yeni Ödev Yayınla</h3>
     <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
     <input type="text" id="title" placeholder="Ödev Başlığı">
-    <textarea id="desc" placeholder="Açıklama..."></textarea>
+    <textarea id="desc" placeholder="Ödev Açıklaması..."></textarea>
     <button onclick="publishHomework()">Yayınla ve Bildirim Gönder 🚀</button>
 
-    <h3 style="margin-top: 25px;">Verilen Ödevler</h3>
+    <h3>Verilen Ödevler</h3>
     <div id="homeworkList">Yükleniyor...</div>
 </div>
 
@@ -43,8 +45,8 @@
                 await fetch('/api/subscribe', {
                     method: 'POST',
                     body: JSON.stringify(sub),
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                    headers: { 'Content-Type': 'application/json' }}
+                );
             }
         }
     }
@@ -56,7 +58,7 @@
         const desc = document.getElementById('desc').value;
 
         if(!subject || !title) {
-            alert('Lütfen alanları doldurun.');
+            alert('Lütfen ders adı ve başlığı doldurun.');
             return;
         }
 
@@ -82,14 +84,14 @@
         const container = document.getElementById('homeworkList');
         
         if(list.length === 0) {
-            container.innerHTML = '<p style="color:#666;">Henüz ödev yok.</p>';
+            container.innerHTML = '<p style="color:#64748b; font-size:14px;">Henüz verilmiş ödev yok.</p>';
             return;
         }
 
         container.innerHTML = list.map(hw => `
             <div class="homework-item">
                 <strong>${hw.subject}</strong>: ${hw.title}
-                <p style="margin: 5px 0 0 0; color: #4b5563; font-size: 14px;">${hw.desc}</p>
+                <p style="margin: 5px 0 0 0; color: #475569; font-size: 14px;">${hw.desc}</p>
             </div>
         `).join('');
     }
