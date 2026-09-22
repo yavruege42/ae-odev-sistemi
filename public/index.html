@@ -3,107 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
     <title>AE Ödev Sistemi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #1f2937; text-align: center; }
+        .card { background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+        button { background: #4f46e5; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+        button:hover { background: #4338ca; }
+        
+        /* Ödev Durum Renkleri */
+        .badge { padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px; }
+        .status-yapti { background: #16a34a; }          /* Yeşil */
+        .status-yapmadi { background: #dc2626; }        /* Kırmızı */
+        .status-eksik { background: #ca8a04; color: black; } /* Sarı */
+        .status-getirmedi { background: #7f1d1d; }     /* Bordo */
+        .status-gec { background: #eab308; color: black; }   /* Ateş Sarısı */
+        .status-gelmedi { background: #ea580c; }      /* Turuncu */
+        .status-izinli { background: #4b5563; }       /* Gri */
+
+        .tab-btn { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn button { background: #e5e7eb; color: #374151; }
+        .tab-btn button.active { background: #4f46e5; color: white; }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col justify-between">
+<body>
 
-    <header class="bg-indigo-700 text-white shadow-md">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="bg-white text-indigo-700 p-2 rounded-lg font-bold text-xl shadow">
-                    <i class="fa-solid fa-graduation-cap"></i>
+<div class="container">
+    <h2>📚 AE Ödev ve Takip Sistemi</h2>
+    
+    <div class="tab-btn">
+        <button id="btnTeacher" onclick="switchTab('teacher')">Öğretmen Paneli</button>
+        <button id="btnStudent" onclick="switchTab('student')">Öğrenci / Veli Paneli</button>
+    </div>
+
+    <!-- ÖĞRETMEN PANELİ -->
+    <div id="teacherPanel" class="card">
+        <h3>Yeni Ödev Yayınla & Bildirim Gönder</h3>
+        <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
+        <input type="text" id="title" placeholder="Ödev Başlığı / Konusu">
+        <textarea id="desc" placeholder="Ödev detayları ve açıklaması..."></textarea>
+        <button onclick="publishHomework()">Ödevi Yayınla ve Bildirim Gönder 🚀</button>
+    </div>
+
+    <!-- ÖĞRENCİ PANELİ -->
+    <div id="studentPanel" class="card" style="display:none;">
+        <h3>Verilen Ödevler ve Durumlar</h3>
+        <div id="homeworkList">Yükleniyor...</div>
+    </div>
+</div>
+
+<script>
+    function switchTab(role) {
+        if(role === 'teacher') {
+            document.getElementById('teacherPanel').style.display = 'block';
+            document.getElementById('studentPanel').style.display = 'none';
+            document.getElementById('btnTeacher').classList.add('active');
+            document.getElementById('btnStudent').classList.remove('active');
+        } else {
+            document.getElementById('teacherPanel').style.display = 'none';
+            document.getElementById('studentPanel').style.display = 'block';
+            document.getElementById('btnStudent').classList.add('active');
+            document.getElementById('btnTeacher').classList.remove('active');
+            loadHomeworks();
+        }
+    }
+
+    // Bildirim İzni İsteme
+    async function requestNotificationPermission() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            const reg = await navigator.serviceWorker.register('/sw.js');
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+                });
+                await fetch('/api/subscribe', {
+                    method: 'POST',
+                    body: JSON.stringify(sub),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+        }
+    }
+    requestNotificationPermission();
+
+    async function publishHomework() {
+        const subject = document.getElementById('subject').value;
+        const title = document.getElementById('title').value;
+        const desc = document.getElementById('desc').value;
+
+        if(!subject || !title) {
+            alert('Lütfen ders adı ve ödev başlığını doldurun.');
+            return;
+        }
+
+        const res = await fetch('/api/publish-homework', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subject, title, desc })
+        });
+
+        const data = await res.json();
+        if(data.success) {
+            alert('Ödev başarıyla yayınlandı ve cihazlara bildirim gönderildi!');
+            document.getElementById('subject').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('desc').value = '';
+        }
+    }
+
+    async function loadHomeworks() {
+        const res = await fetch('/api/homeworks');
+        const list = await res.json();
+        const container = document.getElementById('homeworkList');
+        
+        if(list.length === 0) {
+            container.innerHTML = '<p>Henüz verilmiş bir ödev yok.</p>';
+            return;
+        }
+
+        container.innerHTML = list.map(hw => `
+            <div style="background:white; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ddd;">
+                <strong>${hw.subject}</strong>: ${hw.title}
+                <p style="margin:5px 0; color:#555;">${hw.desc}</p>
+                <hr style="border:0; border-top:1px solid #eee;">
+                <label>Ödev Durumu:</label>
+                <select onchange="updateStatus(${hw.id}, this.value)">
+                    <option value="yapti" ${hw.status==='yapti'?'selected':''}>Yaptı (Yeşil)</option>
+                    <option value="yapmadi" ${hw.status==='yapmadi'?'selected':''}>Yapmadı (Kırmızı)</option>
+                    <option value="eksik" ${hw.status==='eksik'?'selected':''}>Eksik (Sarı)</option>
+                    <option value="getirmedi" ${hw.status==='getirmedi'?'selected':''}>Getirmedi (Bordo)</option>
+                    <option value="gec" ${hw.status==='gec'?'selected':''}>Geç Getirdi (Ateş Sarısı)</option>
+                    <option value="gelmedi" ${hw.status==='gelmedi'?'selected':''}>Gelmedi (Turuncu)</option>
+                    <option value="izinli" ${hw.status==='izinli'?'selected':''}>İzinli (Gri)</option>
+                </select>
+                <div style="margin-top:5px;">
+                    Durum: <span class="badge status-${hw.status}">${getStatusText(hw.status)}</span>
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-wide">AE Ödev Sistemi</h1>
-                    <p class="text-xs text-indigo-200">Gerçek Zamanlı Push Bildirim Portalı</p>
-                </div>
             </div>
-            <div id="user-info" class="flex items-center space-x-4">
-                <span id="display-username" class="text-sm font-medium bg-indigo-800 px-3 py-1.5 rounded-full border border-indigo-600"></span>
-                <button onclick="resetUser()" class="text-xs bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded transition text-indigo-100">
-                    <i class="fa-solid fa-user-pen mr-1"></i> Değiştir
-                </button>
-            </div>
-        </div>
-    </header>
+        `).join('');
+    }
 
-    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
-        <!-- Giriş Modal -->
-        <div id="setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100">
-                <div class="text-center mb-6">
-                    <div class="inline-flex bg-indigo-100 text-indigo-600 p-3 rounded-full mb-3 text-2xl">
-                        <i class="fa-solid fa-user-shield text-indigo-600"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800">AE Ödev Sistemine Giriş</h2>
-                    <p class="text-sm text-slate-500 mt-1">Bildirim alabilmek için adınızı ve rolünüzü seçin.</p>
-                </div>
-                <form id="setup-form" onsubmit="saveUserAndRole(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Adınız Soyadınız</label>
-                        <input type="text" id="input-name" required placeholder="Örn: Ege Yavru" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sistem Rolü</label>
-                        <select id="input-role" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
-                            <option value="ogrenci">Öğrenci Portalı</option>
-                            <option value="ogretmen">Öğretmen Portalı</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md transition">
-                        Sisteme Giriş Yap & Bildirimleri Aç
-                    </button>
-                </form>
-            </div>
-        </div>
+    function getStatusText(status) {
+        switch(status) {
+            case 'yapti': return 'YAPTI';
+            case 'yapmadi': return 'YAPMADI';
+            case 'eksik': return 'EKSİK';
+            case 'getirmedi': return 'GETİRMEDİ';
+            case 'gec': return 'GEÇ GETİRDİ';
+            case 'gelmedi': return 'GELMEDİ';
+            case 'izinli': return 'İZİNLİ';
+            default: return 'YAPTI';
+        }
+    }
 
-        <!-- Öğretmen Paneli -->
-        <div id="teacher-panel" class="space-y-6 hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                    <i class="fa-solid fa-circle-plus text-indigo-600 mr-2"></i> Yeni Ödev Yayınla (Tüm Cihazlara Bildirim Gider)
-                </h2>
-                <form onsubmit="handleCreateHomework(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ödev Başlığı</label>
-                        <input type="text" id="hw-title" required placeholder="Örn: Fizik Projesi" class="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ders Adı</label>
-                        <input type="text" id="hw-subject" required placeholder="Örn: Fizik" class="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Açıklama</label>
-                        <textarea id="hw-desc" rows="3" required placeholder="Detaylar..." class="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Son Teslim Tarihi</label>
-                        <input type="date" id="hw-deadline" required class="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg shadow transition">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> Yayınla ve Bildirim Gönder
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4">Yayınlanan Ödevler</h2>
-                <div id="teacher-hw-list" class="space-y-4"></div>
-            </div>
-        </div>
+    async function updateStatus(id, status) {
+        await fetch('/api/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, status })
+        });
+        loadHomeworks();
+    }
+</script>
 
-        <!-- Öğrenci Paneli -->
-        <div id="student-panel" class="space-y-6 hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4">Aktif Ödevler</h2>
-                <div id="student-hw-list" class="space-y-4"></div>
-            </div>
-        </div>
-    </main>
-
-    <script src="app.js"></script>
 </body>
 </html>
