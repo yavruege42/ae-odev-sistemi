@@ -18,7 +18,7 @@
         /* Ana Düzen */
         .main-wrapper { display: flex; max-width: 1300px; margin: 20px auto; gap: 20px; padding: 0 10px; }
         
-        /* Sol Profil Kartı (İsimsiz) */
+        /* Sol Profil Kartı */
         .sidebar-profile { width: 260px; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; height: fit-content; }
         .sidebar-profile img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #f97316; margin-bottom: 10px; }
         .sidebar-profile p { color: #f97316; font-size: 13px; font-weight: bold; margin: 5px 0; }
@@ -26,9 +26,9 @@
         /* İçerik Alanı */
         .content-area { flex: 1; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 500px; }
 
-        /* Öğrenci Portalı (1. Görsel Tarzı Renkli Bloklar) */
+        /* Öğrenci Portalı Renkli Bloklar */
         .student-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
-        .k12-block { padding: 20px; border-radius: 6px; color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .k12-block { padding: 20px; border-radius: 6px; color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .bg-green { background: #22c55e; }
         .bg-red { background: #ef4444; }
         .bg-yellow { background: #eab308; color: #1f2937; }
@@ -36,18 +36,29 @@
         .bg-purple { background: #a855f7; }
         .bg-orange { background: #f97316; }
 
-        /* Öğretmen Portalı (2. Görsel Tarzı Sol Menü ve Tablo Alanı) */
+        /* Öğretmen Portalı Düzeni */
         .teacher-layout { display: flex; gap: 20px; }
         .teacher-sidebar { width: 220px; border-right: 1px solid #e5e7eb; padding-right: 15px; }
         .teacher-menu-item { padding: 10px 12px; margin-bottom: 5px; border-radius: 4px; color: #374151; font-size: 14px; cursor: pointer; font-weight: 500; }
         .teacher-menu-item:hover, .teacher-menu-item.active { background: #f97316; color: white; }
         
         .teacher-content { flex: 1; }
-        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; }
         .btn-submit { background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
         .btn-submit:hover { background: #c2410c; }
 
-        .homework-list-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; margin-top: 10px; border-radius: 6px; }
+        /* Ödev Kartları ve Durum Renk Rozetleri */
+        .homework-list-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; margin-top: 12px; border-radius: 6px; }
+        
+        .badge { padding: 4px 10px; border-radius: 4px; color: white; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px; }
+        .status-yapti { background: #22c55e; }          /* Yeşil */
+        .status-yapmadi { background: #ef4444; }        /* Kırmızı */
+        .status-eksik { background: #eab308; color: #1f2937; } /* Sarı */
+        .status-getirmedi { background: #581c87; }     /* Bordo / Koyu Mor */
+        .status-gec { background: #d97706; }           /* Ateş Sarısı / Turuncu-Kahve */
+        .status-gelmedi { background: #f97316; }       /* Turuncu */
+        .status-izinli { background: #6b7280; }        /* Gri */
+        .status-ertelendi { background: #3b82f6; }     /* Mavi */
     </style>
 </head>
 <body>
@@ -63,10 +74,10 @@
 
     <div class="main-wrapper">
         
-        <!-- Sol Profil (İsimsiz) -->
+        <!-- Sol Profil (İsimsiz ve Okulsuz) -->
         <div class="sidebar-profile">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Profil">
-            <p>AÇELYA ORTAOKULU</p>
+            <p>EVİÇİ TAKİP SİSTEMİ</p>
         </div>
 
         <!-- Ana İçerik Ekranı -->
@@ -84,7 +95,7 @@
                     <div class="k12-block bg-orange">Ödevler <span>📖</span></div>
                 </div>
                 
-                <h3 style="margin-top:25px; color:#1f2937;">Aktif Ödevler ve Duyurular</h3>
+                <h3 style="margin-top:25px; color:#1f2937;">Aktif Ödevler ve Durumlar</h3>
                 <div id="studentHomeworkList">Yükleniyor...</div>
             </div>
 
@@ -94,7 +105,7 @@
                     <!-- Sol Menü -->
                     <div class="teacher-sidebar">
                         <div class="teacher-menu-item">Ana Sayfa</div>
-                        <div class="teacher-menu-item active">Ödev Sistemi (Dersler Yerine)</div>
+                        <div class="teacher-menu-item active">Ödev Sistemi & Değerlendirme</div>
                         <div class="teacher-menu-item">Sınavlar</div>
                         <div class="teacher-menu-item">Konular</div>
                         <div class="teacher-menu-item">Davranış Değerlendirme</div>
@@ -106,8 +117,11 @@
                         <h3 style="margin-top:0; color:#1f2937;">Yeni Ödev Yayınla ve Bildirim Gönder</h3>
                         <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
                         <input type="text" id="title" placeholder="Ödev Konusu / Başlığı">
-                        <textarea id="desc" rows="4" placeholder="Ödev detaylarını yazın..."></textarea>
+                        <textarea id="desc" rows="3" placeholder="Ödev detaylarını yazın..."></textarea>
                         <button class="btn-submit" onclick="publishHomework()">Yayınla ve Tüm Cihazlara Bildirim Gönder 🚀</button>
+                        
+                        <h3 style="margin-top:30px; color:#1f2937; border-top:1px solid #e5e7eb; padding-top:15px;">Verilen Ödevleri Değerlendir ve Durum Değiştir</h3>
+                        <div id="teacherHomeworkList">Yükleniyor...</div>
                     </div>
                 </div>
             </div>
@@ -122,12 +136,13 @@
             document.getElementById('teacherPortalView').style.display = 'none';
             document.getElementById('btnStudentTab').classList.add('active');
             document.getElementById('btnTeacherTab').classList.remove('active');
-            loadStudentHomeworks();
+            loadHomeworks();
         } else {
             document.getElementById('studentPortalView').style.display = 'none';
             document.getElementById('teacherPortalView').style.display = 'block';
             document.getElementById('btnTeacherTab').classList.add('active');
             document.getElementById('btnStudentTab').classList.remove('active');
+            loadHomeworks();
         }
     }
 
@@ -176,29 +191,77 @@
             document.getElementById('subject').value = '';
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
-            switchPortal('student');
+            loadHomeworks();
         }
     }
 
-    async function loadStudentHomeworks() {
+    async function loadHomeworks() {
         const res = await fetch('/api/homeworks');
         const list = await res.json();
-        const container = document.getElementById('studentHomeworkList');
         
+        // Öğrenci listesi
+        const studentContainer = document.getElementById('studentHomeworkList');
         if(list.length === 0) {
-            container.innerHTML = '<p style="color:#6b7280; font-size:14px;">Henüz aktif ödev bulunmuyor.</p>';
-            return;
+            studentContainer.innerHTML = '<p style="color:#6b7280; font-size:14px;">Henüz aktif ödev bulunmuyor.</p>';
+        } else {
+            studentContainer.innerHTML = list.map(hw => `
+                <div class="homework-list-item">
+                    <strong style="color:#f97316;">📌 ${hw.subject}</strong> — ${hw.title}
+                    <p style="margin:5px 0; color:#4b5563; font-size:14px;">${hw.desc}</p>
+                    <div>Durum: <span class="badge status-${hw.status}">${getStatusText(hw.status)}</span></div>
+                </div>
+            `).join('');
         }
 
-        container.innerHTML = list.map(hw => `
-            <div class="homework-list-item">
-                <strong style="color:#f97316;">📌 ${hw.subject}</strong> — ${hw.title}
-                <p style="margin:5px 0 0 0; color:#4b5563; font-size:14px;">${hw.desc}</p>
-            </div>
-        `).join('');
+        // Öğretmen değerlendirme listesi
+        const teacherContainer = document.getElementById('teacherHomeworkList');
+        if(list.length === 0) {
+            teacherContainer.innerHTML = '<p style="color:#6b7280; font-size:14px;">Henüz yayınlanmış ödev yok.</p>';
+        } else {
+            teacherContainer.innerHTML = list.map(hw => `
+                <div class="homework-list-item">
+                    <strong style="color:#f97316;">📌 ${hw.subject}</strong> — ${hw.title}
+                    <p style="margin:5px 0; color:#4b5563; font-size:14px;">${hw.desc}</p>
+                    <label style="font-size:13px; font-weight:bold; display:block; margin-top:8px;">Ödev Durumunu Güncelle:</label>
+                    <select onchange="updateStatus(${hw.id}, this.value)">
+                        <option value="yapti" ${hw.status==='yapti'?'selected':''}>Yaptı (Yeşil)</option>
+                        <option value="yapmadi" ${hw.status==='yapmadi'?'selected':''}>Yapmadı (Kırmızı)</option>
+                        <option value="eksik" ${hw.status==='eksik'?'selected':''}>Eksik (Sarı)</option>
+                        <option value="getirmedi" ${hw.status==='getirmedi'?'selected':''}>Getirmedi (Bordo)</option>
+                        <option value="gec" ${hw.status==='gec'?'selected':''}>Geç Getirdi (Ateş Sarısı)</option>
+                        <option value="gelmedi" ${hw.status==='gelmedi'?'selected':''}>Gelmedi (Turuncu)</option>
+                        <option value="izinli" ${hw.status==='izinli'?'selected':''}>İzinli (Gri)</option>
+                        <option value="ertelendi" ${hw.status==='ertelendi'?'selected':''}>Ertelendi (Mavi)</option>
+                    </select>
+                </div>
+            `).join('');
+        }
     }
 
-    loadStudentHomeworks();
+    function getStatusText(status) {
+        switch(status) {
+            case 'yapti': return 'YAPTI';
+            case 'yapmadi': return 'YAPMADI';
+            case 'eksik': return 'EKSİK';
+            case 'getirmedi': return 'GETİRMEDİ';
+            case 'gec': return 'GEÇ GETİRDİ';
+            case 'gelmedi': return 'GELMEDİ';
+            case 'izinli': return 'İZİNLİ';
+            case 'ertelendi': return 'ERTELENDİ';
+            default: return 'YAPTI';
+        }
+    }
+
+    async function updateStatus(id, status) {
+        await fetch('/api/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, status })
+        });
+        loadHomeworks();
+    }
+
+    loadHomeworks();
 </script>
 
 </body>
