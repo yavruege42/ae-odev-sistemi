@@ -9,8 +9,8 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e5e7eb; margin: 0; padding: 0; }
         
         /* Üst Header Bar */
-        .header-bar { background: #f97316; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
+        .header-bar { background: #f97316; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-logo { font-size: 20px; font-weight: bold; letter-spacing: 0.5px; }
         .portal-switch-btns { display: flex; gap: 10px; }
         .portal-switch-btns button { background: white; color: #f97316; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .portal-switch-btns button.active { background: #c2410c; color: white; }
@@ -18,11 +18,10 @@
         /* Ana Düzen */
         .main-wrapper { display: flex; max-width: 1300px; margin: 20px auto; gap: 20px; padding: 0 10px; }
         
-        /* Sol Profil Kartı */
+        /* Sol Profil Kartı (İsimsiz) */
         .sidebar-profile { width: 260px; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; height: fit-content; }
         .sidebar-profile img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #f97316; margin-bottom: 10px; }
-        .sidebar-profile h4 { margin: 5px 0; color: #1f2937; }
-        .sidebar-profile p { color: #6b7280; font-size: 13px; margin: 0; }
+        .sidebar-profile p { color: #f97316; font-size: 13px; font-weight: bold; margin: 5px 0; }
 
         /* İçerik Alanı */
         .content-area { flex: 1; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 500px; }
@@ -53,9 +52,9 @@
 </head>
 <body>
 
-    <!-- Üst K12Net Header -->
+    <!-- Üst Header Bar -->
     <div class="header-bar">
-        <div class="header-logo">Kl9net</div>
+        <div class="header-logo">AE Ödev Sistemi</div>
         <div class="portal-switch-btns">
             <button id="btnStudentTab" class="active" onclick="switchPortal('student')">Öğrenci Portalı</button>
             <button id="btnTeacherTab" onclick="switchPortal('teacher')">Öğretmen Portalı</button>
@@ -64,18 +63,16 @@
 
     <div class="main-wrapper">
         
-        <!-- Sol Profil (Öğrenci Görselindeki Gibi) -->
+        <!-- Sol Profil (İsimsiz) -->
         <div class="sidebar-profile">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Profil">
-            <h4 id="profileName">ARDA ALPSOY</h4>
-            <p>8/A - 21</p>
-            <p style="margin-top:5px; font-size:12px; color:#f97316; font-weight:bold;">AÇELYA ORTAOKULU</p>
+            <p>AÇELYA ORTAOKULU</p>
         </div>
 
         <!-- Ana İçerik Ekranı -->
         <div class="content-area">
             
-            <!-- ÖĞRENCİ PORTALI (1. Görsel Tarzı) -->
+            <!-- ÖĞRENCİ PORTALI -->
             <div id="studentPortalView">
                 <h3 style="margin-top:0; color:#1f2937; border-bottom:2px solid #f3f4f6; padding-bottom:10px;">Öğrenci Bilgi Ekranı</h3>
                 <div class="student-grid">
@@ -84,14 +81,14 @@
                     <div class="k12-block bg-yellow">Ajanda <span>📅</span></div>
                     <div class="k12-block bg-blue">Sınavlar <span>📝</span></div>
                     <div class="k12-block bg-purple">Davranışlar <span>⭐</span></div>
-                    <div class="k12-block bg-orange" onclick="alert('Ödevler listeleniyor')">Ödevler <span>📖</span></div>
+                    <div class="k12-block bg-orange">Ödevler <span>📖</span></div>
                 </div>
                 
                 <h3 style="margin-top:25px; color:#1f2937;">Aktif Ödevler ve Duyurular</h3>
                 <div id="studentHomeworkList">Yükleniyor...</div>
             </div>
 
-            <!-- ÖĞRETMEN PORTALI (2. Görsel Tarzı Sol Menülü) -->
+            <!-- ÖĞRETMEN PORTALI -->
             <div id="teacherPortalView" style="display:none;">
                 <div class="teacher-layout">
                     <!-- Sol Menü -->
@@ -125,18 +122,15 @@
             document.getElementById('teacherPortalView').style.display = 'none';
             document.getElementById('btnStudentTab').classList.add('active');
             document.getElementById('btnTeacherTab').classList.remove('active');
-            document.getElementById('profileName').innerText = "ARDA ALPSOY";
             loadStudentHomeworks();
         } else {
             document.getElementById('studentPortalView').style.display = 'none';
             document.getElementById('teacherPortalView').style.display = 'block';
             document.getElementById('btnTeacherTab').classList.add('active');
             document.getElementById('btnStudentTab').classList.remove('active');
-            document.getElementById('profileName').innerText = "DENİZ ASLAN";
         }
     }
 
-    // Push Bildirim Kaydı
     async function requestNotificationPermission() {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             try {
