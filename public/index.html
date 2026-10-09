@@ -6,59 +6,115 @@
     <link rel="manifest" href="/manifest.json">
     <title>AE Ödev Sistemi</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #eff6ff; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1); }
-        h2 { color: #1e40af; text-align: center; }
-        h3 { color: #1e3a8a; font-size: 16px; margin-top: 20px; }
-        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #93c5fd; border-radius: 6px; box-sizing: border-box; }
-        input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
-        button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
-        button:hover { background: #1d4ed8; }
-        .homework-item { background: #f8fafc; border: 1px solid #bfdbfe; padding: 12px; margin-top: 10px; border-radius: 6px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eff6ff; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 14px; box-shadow: 0 6px 15px rgba(37, 99, 235, 0.12); }
+        
+        /* HVT Tarzı Kayan Yazı Bantı */
+        .marquee-container { background: #1e40af; color: white; padding: 8px; border-radius: 8px; margin-bottom: 20px; overflow: hidden; white-space: nowrap; font-size: 14px; font-weight: bold; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .marquee-container marquee { width: 100%; }
+
+        h2 { color: #1e40af; text-align: center; margin-bottom: 20px; }
+        
+        /* Portal Sekme Butonları */
+        .portal-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .portal-tabs button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; background: #dbeafe; color: #1e40af; }
+        .portal-tabs button.active { background: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+
+        .portal-section { display: none; }
+        .portal-section.active { display: block; }
+
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #93c5fd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+        
+        .btn-primary { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: background 0.2s; }
+        .btn-primary:hover { background: #1d4ed8; }
+
+        .homework-card { background: #f8fafc; border-left: 4px solid #2563eb; border: 1px solid #bfdbfe; padding: 15px; margin-top: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .homework-card strong { color: #1e3a8a; font-size: 16px; }
+        .homework-desc { margin: 8px 0 0 0; color: #475569; font-size: 14px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- HVT Tarzı Kayan Duyuru -->
+    <div class="marquee-container">
+        <marquee behavior="scroll" direction="left">⚡ AE Ödev ve Bilgilendirme Sistemine Hoş Geldiniz! • Güncel ödevlerinizi takip etmeyi ve bildirimleri açık tutmayı unutmayın! 🚀</marquee>
+    </div>
+
     <h2>📚 AE Ödev Sistemi</h2>
     
-    <h3>Yeni Ödev Yayınla</h3>
-    <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
-    <input type="text" id="title" placeholder="Ödev Başlığı">
-    <textarea id="desc" placeholder="Ödev Açıklaması..."></textarea>
-    <button onclick="publishHomework()">Yayınla ve Bildirim Gönder 🚀</button>
+    <!-- Portal Seçim Sekmeleri -->
+    <div class="portal-tabs">
+        <button id="tabTeacherBtn" class="active" onclick="switchPortal('teacher')">👨‍🏫 Öğretmen Portalı</button>
+        <button id="tabStudentBtn" onclick="switchPortal('student')">👨‍🎓 Öğrenci / Veli Portalı</button>
+    </div>
 
-    <h3>Verilen Ödevler</h3>
-    <div id="homeworkList">Yükleniyor...</div>
+    <!-- ÖĞRETMEN PORTALI -->
+    <div id="teacherPortal" class="portal-section active">
+        <h3 style="color: #1e3a8a; margin-top: 0;">Yeni Ödev Yayınla</h3>
+        <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
+        <input type="text" id="title" placeholder="Ödev Başlığı / Konusu">
+        <textarea id="desc" rows="4" placeholder="Ödevin detaylarını buraya yazın..."></textarea>
+        <button class="btn-primary" onclick="publishHomework()">Yayınla ve Tüm Cihazlara Bildirim Gönder 🚀</button>
+    </div>
+
+    <!-- ÖĞRENCİ PORTALI -->
+    <div id="studentPortal" class="portal-section">
+        <h3 style="color: #1e3a8a; margin-top: 0;">Verilen Güncel Ödevler</h3>
+        <div id="homeworkList">Ödevler yükleniyor...</div>
+    </div>
 </div>
 
 <script>
+    // Portal Değiştirme Fonksiyonu
+    function switchPortal(role) {
+        if(role === 'teacher') {
+            document.getElementById('teacherPortal').classList.add('active');
+            document.getElementById('studentPortal').classList.remove('active');
+            document.getElementById('tabTeacherBtn').classList.add('active');
+            document.getElementById('tabStudentBtn').classList.remove('active');
+        } else {
+            document.getElementById('teacherPortal').classList.remove('active');
+            document.getElementById('studentPortal').classList.add('active');
+            document.getElementById('tabStudentBtn').classList.add('active');
+            document.getElementById('tabTeacherBtn').classList.remove('active');
+            loadHomeworks(); // Öğrenci sekmesine geçince ödevleri yenile
+        }
+    }
+
+    // Bildirim İzni Otomatik İsteme
     async function requestNotificationPermission() {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
-            const reg = await navigator.serviceWorker.register('/sw.js');
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                const sub = await reg.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-                });
-                await fetch('/api/subscribe', {
-                    method: 'POST',
-                    body: JSON.stringify(sub),
-                    headers: { 'Content-Type': 'application/json' }}
-                );
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const sub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+                    });
+                    await fetch('/api/subscribe', {
+                        method: 'POST',
+                        body: JSON.stringify(sub),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+            } catch (e) {
+                console.error("Bildirim izni hatası:", e);
             }
         }
     }
     requestNotificationPermission();
 
+    // Ödev Yayınlama
     async function publishHomework() {
-        const subject = document.getElementById('subject').value;
-        const title = document.getElementById('title').value;
-        const desc = document.getElementById('desc').value;
+        const subject = document.getElementById('subject').value.trim();
+        const title = document.getElementById('title').value.trim();
+        const desc = document.getElementById('desc').value.trim();
 
         if(!subject || !title) {
-            alert('Lütfen ders adı ve başlığı doldurun.');
+            alert('Lütfen ders adı ve ödev başlığını boş bırakmayın.');
             return;
         }
 
@@ -70,28 +126,29 @@
 
         const data = await res.json();
         if(data.success) {
-            alert('Ödev yayınlandı ve bildirim gönderildi!');
+            alert('Ödev başarıyla yayınlandı ve cihazlara anlık bildirim yollandı!');
             document.getElementById('subject').value = '';
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
-            loadHomeworks();
+            switchPortal('student'); // Yayınladıktan sonra otomatik öğrenci paneline atıp ödevleri gösterir
         }
     }
 
+    // Ödevleri Listeleme
     async function loadHomeworks() {
         const res = await fetch('/api/homeworks');
         const list = await res.json();
         const container = document.getElementById('homeworkList');
         
         if(list.length === 0) {
-            container.innerHTML = '<p style="color:#64748b; font-size:14px;">Henüz verilmiş ödev yok.</p>';
+            container.innerHTML = '<p style="color:#64748b; font-size:14px; text-align:center; padding:20px;">Henüz verilmiş bir ödev bulunmuyor.</p>';
             return;
         }
 
         container.innerHTML = list.map(hw => `
-            <div class="homework-item">
-                <strong>${hw.subject}</strong>: ${hw.title}
-                <p style="margin: 5px 0 0 0; color: #475569; font-size: 14px;">${hw.desc}</p>
+            <div class="homework-card">
+                <strong>📌 ${hw.subject}</strong> — ${hw.title}
+                <p class="homework-desc">${hw.desc}</p>
             </div>
         `).join('');
     }
