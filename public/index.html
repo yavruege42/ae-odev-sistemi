@@ -6,84 +6,137 @@
     <link rel="manifest" href="/manifest.json">
     <title>AE Ödev Sistemi</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eff6ff; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 14px; box-shadow: 0 6px 15px rgba(37, 99, 235, 0.12); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e5e7eb; margin: 0; padding: 0; }
         
-        /* HVT Tarzı Kayan Yazı Bantı */
-        .marquee-container { background: #1e40af; color: white; padding: 8px; border-radius: 8px; margin-bottom: 20px; overflow: hidden; white-space: nowrap; font-size: 14px; font-weight: bold; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        .marquee-container marquee { width: 100%; }
+        /* Üst Header Bar */
+        .header-bar { background: #f97316; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
+        .portal-switch-btns { display: flex; gap: 10px; }
+        .portal-switch-btns button { background: white; color: #f97316; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .portal-switch-btns button.active { background: #c2410c; color: white; }
 
-        h2 { color: #1e40af; text-align: center; margin-bottom: 20px; }
+        /* Ana Düzen */
+        .main-wrapper { display: flex; max-width: 1300px; margin: 20px auto; gap: 20px; padding: 0 10px; }
         
-        /* Portal Sekme Butonları */
-        .portal-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .portal-tabs button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; background: #dbeafe; color: #1e40af; }
-        .portal-tabs button.active { background: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+        /* Sol Profil Kartı */
+        .sidebar-profile { width: 260px; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; height: fit-content; }
+        .sidebar-profile img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #f97316; margin-bottom: 10px; }
+        .sidebar-profile h4 { margin: 5px 0; color: #1f2937; }
+        .sidebar-profile p { color: #6b7280; font-size: 13px; margin: 0; }
 
-        .portal-section { display: none; }
-        .portal-section.active { display: block; }
+        /* İçerik Alanı */
+        .content-area { flex: 1; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 500px; }
 
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #93c5fd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+        /* Öğrenci Portalı (1. Görsel Tarzı Renkli Bloklar) */
+        .student-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .k12-block { padding: 20px; border-radius: 6px; color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .bg-green { background: #22c55e; }
+        .bg-red { background: #ef4444; }
+        .bg-yellow { background: #eab308; color: #1f2937; }
+        .bg-blue { background: #3b82f6; }
+        .bg-purple { background: #a855f7; }
+        .bg-orange { background: #f97316; }
+
+        /* Öğretmen Portalı (2. Görsel Tarzı Sol Menü ve Tablo Alanı) */
+        .teacher-layout { display: flex; gap: 20px; }
+        .teacher-sidebar { width: 220px; border-right: 1px solid #e5e7eb; padding-right: 15px; }
+        .teacher-menu-item { padding: 10px 12px; margin-bottom: 5px; border-radius: 4px; color: #374151; font-size: 14px; cursor: pointer; font-weight: 500; }
+        .teacher-menu-item:hover, .teacher-menu-item.active { background: #f97316; color: white; }
         
-        .btn-primary { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: background 0.2s; }
-        .btn-primary:hover { background: #1d4ed8; }
+        .teacher-content { flex: 1; }
+        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-submit:hover { background: #c2410c; }
 
-        .homework-card { background: #f8fafc; border-left: 4px solid #2563eb; border: 1px solid #bfdbfe; padding: 15px; margin-top: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .homework-card strong { color: #1e3a8a; font-size: 16px; }
-        .homework-desc { margin: 8px 0 0 0; color: #475569; font-size: 14px; line-height: 1.4; }
+        .homework-list-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; margin-top: 10px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- HVT Tarzı Kayan Duyuru -->
-    <div class="marquee-container">
-        <marquee behavior="scroll" direction="left">⚡ AE Ödev ve Bilgilendirme Sistemine Hoş Geldiniz! • Güncel ödevlerinizi takip etmeyi ve bildirimleri açık tutmayı unutmayın! 🚀</marquee>
+    <!-- Üst K12Net Header -->
+    <div class="header-bar">
+        <div class="header-logo">Kl9net</div>
+        <div class="portal-switch-btns">
+            <button id="btnStudentTab" class="active" onclick="switchPortal('student')">Öğrenci Portalı</button>
+            <button id="btnTeacherTab" onclick="switchPortal('teacher')">Öğretmen Portalı</button>
+        </div>
     </div>
 
-    <h2>📚 AE Ödev Sistemi</h2>
-    
-    <!-- Portal Seçim Sekmeleri -->
-    <div class="portal-tabs">
-        <button id="tabTeacherBtn" class="active" onclick="switchPortal('teacher')">👨‍🏫 Öğretmen Portalı</button>
-        <button id="tabStudentBtn" onclick="switchPortal('student')">👨‍🎓 Öğrenci / Veli Portalı</button>
-    </div>
+    <div class="main-wrapper">
+        
+        <!-- Sol Profil (Öğrenci Görselindeki Gibi) -->
+        <div class="sidebar-profile">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Profil">
+            <h4 id="profileName">ARDA ALPSOY</h4>
+            <p>8/A - 21</p>
+            <p style="margin-top:5px; font-size:12px; color:#f97316; font-weight:bold;">AÇELYA ORTAOKULU</p>
+        </div>
 
-    <!-- ÖĞRETMEN PORTALI -->
-    <div id="teacherPortal" class="portal-section active">
-        <h3 style="color: #1e3a8a; margin-top: 0;">Yeni Ödev Yayınla</h3>
-        <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
-        <input type="text" id="title" placeholder="Ödev Başlığı / Konusu">
-        <textarea id="desc" rows="4" placeholder="Ödevin detaylarını buraya yazın..."></textarea>
-        <button class="btn-primary" onclick="publishHomework()">Yayınla ve Tüm Cihazlara Bildirim Gönder 🚀</button>
-    </div>
+        <!-- Ana İçerik Ekranı -->
+        <div class="content-area">
+            
+            <!-- ÖĞRENCİ PORTALI (1. Görsel Tarzı) -->
+            <div id="studentPortalView">
+                <h3 style="margin-top:0; color:#1f2937; border-bottom:2px solid #f3f4f6; padding-bottom:10px;">Öğrenci Bilgi Ekranı</h3>
+                <div class="student-grid">
+                    <div class="k12-block bg-green">Mesajlar <span>✉</span></div>
+                    <div class="k12-block bg-red">Etütler <span>📚</span></div>
+                    <div class="k12-block bg-yellow">Ajanda <span>📅</span></div>
+                    <div class="k12-block bg-blue">Sınavlar <span>📝</span></div>
+                    <div class="k12-block bg-purple">Davranışlar <span>⭐</span></div>
+                    <div class="k12-block bg-orange" onclick="alert('Ödevler listeleniyor')">Ödevler <span>📖</span></div>
+                </div>
+                
+                <h3 style="margin-top:25px; color:#1f2937;">Aktif Ödevler ve Duyurular</h3>
+                <div id="studentHomeworkList">Yükleniyor...</div>
+            </div>
 
-    <!-- ÖĞRENCİ PORTALI -->
-    <div id="studentPortal" class="portal-section">
-        <h3 style="color: #1e3a8a; margin-top: 0;">Verilen Güncel Ödevler</h3>
-        <div id="homeworkList">Ödevler yükleniyor...</div>
+            <!-- ÖĞRETMEN PORTALI (2. Görsel Tarzı Sol Menülü) -->
+            <div id="teacherPortalView" style="display:none;">
+                <div class="teacher-layout">
+                    <!-- Sol Menü -->
+                    <div class="teacher-sidebar">
+                        <div class="teacher-menu-item">Ana Sayfa</div>
+                        <div class="teacher-menu-item active">Ödev Sistemi (Dersler Yerine)</div>
+                        <div class="teacher-menu-item">Sınavlar</div>
+                        <div class="teacher-menu-item">Konular</div>
+                        <div class="teacher-menu-item">Davranış Değerlendirme</div>
+                        <div class="teacher-menu-item">Öğrenciler</div>
+                        <div class="teacher-menu-item">Mesaj Gönder</div>
+                    </div>
+                    <!-- Sağ İçerik -->
+                    <div class="teacher-content">
+                        <h3 style="margin-top:0; color:#1f2937;">Yeni Ödev Yayınla ve Bildirim Gönder</h3>
+                        <input type="text" id="subject" placeholder="Ders Adı (Örn: Matematik)">
+                        <input type="text" id="title" placeholder="Ödev Konusu / Başlığı">
+                        <textarea id="desc" rows="4" placeholder="Ödev detaylarını yazın..."></textarea>
+                        <button class="btn-submit" onclick="publishHomework()">Yayınla ve Tüm Cihazlara Bildirim Gönder 🚀</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
 
 <script>
-    // Portal Değiştirme Fonksiyonu
     function switchPortal(role) {
-        if(role === 'teacher') {
-            document.getElementById('teacherPortal').classList.add('active');
-            document.getElementById('studentPortal').classList.remove('active');
-            document.getElementById('tabTeacherBtn').classList.add('active');
-            document.getElementById('tabStudentBtn').classList.remove('active');
+        if(role === 'student') {
+            document.getElementById('studentPortalView').style.display = 'block';
+            document.getElementById('teacherPortalView').style.display = 'none';
+            document.getElementById('btnStudentTab').classList.add('active');
+            document.getElementById('btnTeacherTab').classList.remove('active');
+            document.getElementById('profileName').innerText = "ARDA ALPSOY";
+            loadStudentHomeworks();
         } else {
-            document.getElementById('teacherPortal').classList.remove('active');
-            document.getElementById('studentPortal').classList.add('active');
-            document.getElementById('tabStudentBtn').classList.add('active');
-            document.getElementById('tabTeacherBtn').classList.remove('active');
-            loadHomeworks(); // Öğrenci sekmesine geçince ödevleri yenile
+            document.getElementById('studentPortalView').style.display = 'none';
+            document.getElementById('teacherPortalView').style.display = 'block';
+            document.getElementById('btnTeacherTab').classList.add('active');
+            document.getElementById('btnStudentTab').classList.remove('active');
+            document.getElementById('profileName').innerText = "DENİZ ASLAN";
         }
     }
 
-    // Bildirim İzni Otomatik İsteme
+    // Push Bildirim Kaydı
     async function requestNotificationPermission() {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             try {
@@ -101,20 +154,19 @@
                     });
                 }
             } catch (e) {
-                console.error("Bildirim izni hatası:", e);
+                console.error(e);
             }
         }
     }
     requestNotificationPermission();
 
-    // Ödev Yayınlama
     async function publishHomework() {
         const subject = document.getElementById('subject').value.trim();
         const title = document.getElementById('title').value.trim();
         const desc = document.getElementById('desc').value.trim();
 
         if(!subject || !title) {
-            alert('Lütfen ders adı ve ödev başlığını boş bırakmayın.');
+            alert('Lütfen ders adı ve başlığı doldurun.');
             return;
         }
 
@@ -126,34 +178,33 @@
 
         const data = await res.json();
         if(data.success) {
-            alert('Ödev başarıyla yayınlandı ve cihazlara anlık bildirim yollandı!');
+            alert('Ödev yayınlandı ve bildirimler gönderildi!');
             document.getElementById('subject').value = '';
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
-            switchPortal('student'); // Yayınladıktan sonra otomatik öğrenci paneline atıp ödevleri gösterir
+            switchPortal('student');
         }
     }
 
-    // Ödevleri Listeleme
-    async function loadHomeworks() {
+    async function loadStudentHomeworks() {
         const res = await fetch('/api/homeworks');
         const list = await res.json();
-        const container = document.getElementById('homeworkList');
+        const container = document.getElementById('studentHomeworkList');
         
         if(list.length === 0) {
-            container.innerHTML = '<p style="color:#64748b; font-size:14px; text-align:center; padding:20px;">Henüz verilmiş bir ödev bulunmuyor.</p>';
+            container.innerHTML = '<p style="color:#6b7280; font-size:14px;">Henüz aktif ödev bulunmuyor.</p>';
             return;
         }
 
         container.innerHTML = list.map(hw => `
-            <div class="homework-card">
-                <strong>📌 ${hw.subject}</strong> — ${hw.title}
-                <p class="homework-desc">${hw.desc}</p>
+            <div class="homework-list-item">
+                <strong style="color:#f97316;">📌 ${hw.subject}</strong> — ${hw.title}
+                <p style="margin:5px 0 0 0; color:#4b5563; font-size:14px;">${hw.desc}</p>
             </div>
         `).join('');
     }
 
-    loadHomeworks();
+    loadStudentHomeworks();
 </script>
 
 </body>
