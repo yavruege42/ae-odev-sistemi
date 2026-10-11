@@ -7,43 +7,60 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// web-push kütüphanesinin doğrudan kabul ettiği, matematiksel olarak tam 32-byte'lık test anahtarları
 const publicVapidKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
 const privateVapidKey = 'DH4q58L42wN3_o619r0V6l7rQ87Z789hI091K2lM5o8'; 
 
-// Not: Eğer yukarıdaki private anahtar da hata verirse, web-push otomatik üretici fonksiyonunu kullanalım:
-// const vapidKeys = webpush.generateVapidKeys();
-// webpush.setVapidDetails('mailto:destek@aeodev.com', vapidKeys.publicKey, vapidKeys.privateKey);
-
 webpush.setVapidDetails('mailto:destek@aeodev.com', publicVapidKey, privateVapidKey);
 
-// Bağlanan cihazların abonelik listesi
 let subscriptions = [];
+let homeworks = [];
 
-// Cihazlar bildirim izni verince buraya kaydedilir
 app.post('/api/subscribe', (req, res) => {
     const subscription = req.body;
     if (!subscriptions.some(sub => sub.endpoint === subscription.endpoint)) {
         subscriptions.push(subscription);
     }
-    res.status(201).json({ message: "Cihaz başarıyla kaydedildi." });
+    res.status(201).json({ message: "Cihaz kaydedildi." });
 });
 
-// Ödev yayınlandığında tüm cihazlara bildirim yollar
+app.get('/api/homeworks', (req, res) => {
+    res.json(homeworks);
+});
+
 app.post('/api/publish-homework', (req, res) => {
-    const { title, subject, desc } = req.body;
+    const { title, subject, desc, status } = req.body;
     
+    const newHomework = {
+        id: Date.now(),
+        subject,
+        title,
+        desc,
+        status: status || 'yapti' // Öğretmenin seçtiği başlangıç durumu
+    };
+    homeworks.unshift(newHomework);
+
     const payload = JSON.stringify({
         title: `Yeni Ödev: ${subject}`,
         body: `${title} - ${desc}`
     });
 
     Promise.all(subscriptions.map(sub => 
-        webpush.sendNotification(sub, payload).catch(err => console.error("Bildirim hatası:", err))
+        webpush.sendNotification(sub, payload).catch(err => console.error(err))
     ))
-    .then(() => res.status(200).json({ success: true, message: "Tüm cihazlara bildirim gönderildi!" }))
-    .catch(err => res.status(500).json({ error: "Bildirimler gönderilemedi." }));
+    .then(() => res.status(200).json({ success: true }))
+    .catch(err => res.status(500).json({ error: "Hata" }));
+});
+
+app.post('/api/update-status', (req, res) => {
+    const { id, status } = req.body;
+    const hw = homeworks.find(h => h.id === id);
+    if(hw) {
+        hw.status = status;
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ error: "Bulunamadı" });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`AE Ödev Sistemi ${PORT} portunda çalışıyor...`));
+app.listen(PORT, () => console.log(`Çalışıyor: ${PORT}`));
